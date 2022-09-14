@@ -50,3 +50,47 @@ public struct AnimatedView<T: Any, Content: View>: View {
             }
     }
 }
+
+public extension View {
+    private func screenWidth() -> CGFloat { UIScreen.main.bounds.size.width }
+    
+    @ViewBuilder private func padding(
+        leading: CGFloat,
+        trailing: CGFloat = 0,
+        top: CGFloat = 0,
+        bottom: CGFloat = 0
+    ) -> some View {
+        self.padding(
+            EdgeInsets(
+                top: top,
+                leading: leading,
+                bottom: bottom,
+                trailing: trailing
+            )
+        )
+    }
+    
+    func slideInLeft(duration: Double) -> some View {
+        AnimatedView(-screenWidth(), 0, .linear(duration: duration)) { padding(leading: $0, trailing: -$0) }
+    }
+    
+    func slideInRight(duration: Double) -> some View {
+        AnimatedView(screenWidth(), 0, .linear(duration: duration)) { padding(leading: $0, trailing: -$0) }
+    }
+
+    func fadeIn(duration: Double) -> some View {
+        AnimatedView(0.0, 1, .linear(duration: duration)) { opacity($0) }
+    }
+
+    func slideOutLeft(duration: Double) -> some View {
+        AnimatedView(0, -screenWidth(), .linear(duration: duration)) { padding(leading: $0, trailing: -$0) }
+    }
+    
+    func slideOutRight(duration: Double) -> some View {
+        AnimatedView(0, screenWidth(), .linear(duration: duration)) { padding(leading: $0, trailing: -$0) }
+    }
+    
+    func fadeOut(duration: Double) -> some View {
+        AnimatedView(1, 0.0, .linear(duration: duration)) { opacity($0) }
+    }
+}
