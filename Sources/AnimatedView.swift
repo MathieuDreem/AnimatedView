@@ -24,7 +24,7 @@ import SwiftUI
 /// The ``Text`` instance in the example above will start to grow from 0.2 to 1 in 5 seconds.
 /// 
 public struct AnimatedView<T: Any, Content: View>: View {
-    private var value: State<T>
+    @State private var value: T
     private let finalValue: T
     private let animation: Animation
     @ViewBuilder private let viewModification: (T) -> Content
@@ -35,15 +35,18 @@ public struct AnimatedView<T: Any, Content: View>: View {
         _ animation: Animation,
         @ViewBuilder _ viewModification: @escaping (T) -> Content
     ) {
-        self.value = State(initialValue: initialValue)
+        self._value = State(initialValue: initialValue)
         self.finalValue = finalValue
         self.animation = animation
         self.viewModification = viewModification
     }
     
     public var body: some View {
-        viewModification(value.wrappedValue)
-            .animation(animation)
-            .onAppear { value.wrappedValue = finalValue }
+        viewModification(value)
+            .onAppear {
+                withAnimation(animation) {
+                    value = finalValue
+                }
+            }
     }
 }
